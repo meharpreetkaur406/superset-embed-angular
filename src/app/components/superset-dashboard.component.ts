@@ -12,26 +12,40 @@ import { HttpClient } from '@angular/common/http';
 })
 export class SupersetDashboard {
     async ngAfterViewInit() {
-
-        const token = await fetch('http://localhost:5124/api/superset/guest-token')
-        .then(res => res.json())
-        .then(data => data.token);
-
+        console.log("VIEW INIT FIRED");
+       
         embedDashboard({
             id: '533b8b78-95be-4a5e-8e56-c53ad863e3d4',
             supersetDomain: 'http://192.168.127.113:8088',
             mountPoint: document.getElementById('superset-container')!,
-            fetchGuestToken: async () => token,
+            fetchGuestToken: async () => {
+                console.log("Guest token requested")
+                const token = await fetch('http://localhost:5124/api/superset/guest-token')
+                    .then(res => res.json())
+                    .then(data => data.token);
+                return token;
+
+            },
 
             dashboardUiConfig: {
                 hideTitle: true,
-                hideChartControls: true,
+                // hideChartControls: true,
+                emitDataMasks: true,
                 hideTab: true,
+                filters: {
+                    visible: true,
+                    expanded: true
+                }
             }
         });
         
         const id = await this.getEmbeddedId();
         console.log("id in frontend", id);
+
+        // setTimeout(() => {
+        //     location.reload();
+        //     console.log('reloading')
+        // }, 100000);
     }
 
     async getEmbeddedId(){
